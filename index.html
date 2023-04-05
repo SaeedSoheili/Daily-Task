@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyTask</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+
+<body class="body">
+    <div class="screenSmallAlert">
+        <h1 class="screenSmallAlertText">Your Screen is too Small! Please use Larger Screen Size.</h1>
+        <img class="screenSmallAlertImage" src="assets/icons8-smartphone-tablet-100.png">
+    </div>
+    <div class="container-fluid mainContainer">
+
+        <div class="header">
+            <h1 class="headerTitle ms-5">Daily Task</h1>
+            <ul class="headerMenu">
+                <a href="#">
+                    <li>Home</li>
+                </a>
+                <a href="#">
+                    <li>ToDo's</li>
+                </a>
+                <a href="#">
+                    <li>Counter</li>
+                </a>
+                <a href="#">
+                    <li>Tasks</li>
+                </a>
+                <a href="#">
+                    <li>About Us</li>
+                </a>
+            </ul>
+            <button type="button" class="btn loginBtn text-center" data-bs-toggle="modal"
+                data-bs-target="#loginModal">Login</button>
+        </div>
+        <div class="bodyToDos">
+            <div class="bodyToDosCreatorBox">
+                <label class="bodyToDosCreatorBoxNameLabel" for="bodyToDosCreatorBoxNameInput">What is Your ToDo
+                    Name?</label>
+                <input type="text" id="bodyToDosCreatorBoxNameInput" placeholder="ex: drink water" autocomplete="off"
+                    name="todoname">
+                <p class="bodyToDosErrorsMessages"></p>
+                <button class="bodyToDosCreatorBtn btn">Create ToDo</button>
+                <img class="bodyToDosCreatorImage" width="200px" src="assets/browser-window-displaying-workspace-.png">
+            </div>
+            <div class="bodyToDosCreatedBox table-responsive">
+                <table class="table table-striped table-bordered table-hover text-center toDoListTable">
+                    <tr class="table-dark todosTableHeaderRow">
+                        <th>Number</th>
+                        <th>ToDo</th>
+                        <th>Creation Date</th>
+                        <th>Creation Time</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modalContentLoginDiv">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="modalLoginEmailLabel" for="modalLoginEmailInput">Enter Your
+                            Email</label>
+                        <input type="email" id="modalLoginEmailInput" placeholder="dailytask@email.com" name="email">
+                        <br>
+                        <br>
+                        <label class="modalLoginPasswordLabel" for="modalLoginPasswordInput">Enter Your
+                            Password</label>
+                        <input type="password" id="modalLoginPasswordInput" placeholder="123456789" name="password">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn modalLoginBtn" data-bs-dismiss="modal">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/parse/2.15.0/parse.min.js"></script>
+    <script src="scripts/index.js"></script>
+</body>
+
+</html>
