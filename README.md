@@ -3,6 +3,6 @@
 Need To Work On:
   
   A. ToDos Page
-      - [ ] Create CheckBox For Todos
-      - [ ] Use Cookies to users stay logged in
+      1. Create CheckBox For Todos
+      2. Use Cookies to users stay logged in
       
