@@ -137,6 +137,7 @@ async function login() {
         loadUserToDosFromDB()
         removeLoginBtn()
         showMessageWhenAddToDo("You Logged in , Welcome!", "complete")
+        generateCookie("token", generateToken(), generateExpireTime())
     } catch (error) {
         // If unsuccessful, notify the user or do something else
         showMessageWhenAddToDo(error.message, "error")
@@ -216,6 +217,99 @@ function showMessageWhenAddToDo(message, type) {
 }
 
 
+
+// For Generating Login Cookie For User
+function generateCookie(name, value, expireTime) {
+    if (document.cookie.indexOf(`${name}=`) === -1) {
+
+
+        const CreateLoginCookieDB = Parse.Object.extend("UsersSessions");
+        const createLoginCookieDB = new CreateLoginCookieDB();
+        createLoginCookieDB.set("token", value)
+        createLoginCookieDB.set("username", userUsername)
+        createLoginCookieDB.save().then((result) => {
+            document.cookie = `${name}=${value};expires=${expireTime.toUTCString()};path=/`;
+        }).catch((error) => {
+            console.log("Error saving user login session:", error);
+        });
+    }
+}
+
+function generateExpireTime() {
+    const expireTime = new Date();
+    expireTime.setHours(expireTime.getHours() + 24);
+    return expireTime;
+}
+
+function generateToken() {
+    const tokenBytes = new Uint8Array(16);
+    crypto.getRandomValues(tokenBytes);
+    const token = btoa(String.fromCharCode.apply(null, tokenBytes));
+    return token;
+}
+
+async function autoUserLogInWithCookie() {
+    // Check if the "token" cookie exists
+    if (document.cookie.indexOf('token=') !== -1) {
+        // Get the value of the "token" cookie
+        const tokenValue = getCookie('token');
+
+        // Query the "UsersSessions" class to find the row with the given token
+        const UsersSessions = Parse.Object.extend('UsersSessions');
+        const query = new Parse.Query(UsersSessions);
+        query.equalTo('token', tokenValue);
+        const results = await query.find();
+
+        // If the query returns a result, use the username to find the email and password in the "User" class
+        if (results.length > 0) {
+            const username = results[0].get('username');
+            const User = Parse.Object.extend('User');
+            const userQuery = new Parse.Query(User);
+            userQuery.equalTo('username', username);
+            const userResults = await userQuery.find();
+
+            // If the user is found, log in with their email and password
+            if (userResults.length > 0) {
+                const email = userResults[0].get('email');
+                const password = userResults[0].get('globalpassword');
+                autoLoginWithCookie(email, password);
+            }
+        }
+    }
+}
+
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(`${name}=`)) {
+            return cookie.substring(`${name}=`.length, cookie.length);
+        }
+    }
+    return null;
+}
+
+async function autoLoginWithCookie(email, password) {
+    try {
+        // Use the static logIn method of the Parse.User object to log in the user
+        const user = await Parse.User.logIn(email, password);
+        // If successful, redirect to the home page or do something else
+        // console.log(`Logged in successfully as ${user.get("username")}`);
+        userUsername = user.get("username");
+        userLoggedIn = true;
+        loadUserToDosFromDB()
+        removeLoginBtn()
+        showMessageWhenAddToDo("auto Logged in , Welcome!", "complete")
+        generateCookie("token", generateToken(), generateExpireTime())
+    } catch (error) {
+        // If unsuccessful, notify the user or do something else
+        showMessageWhenAddToDo(error.message, "error")
+        // console.log(`Error: ${error.message}`);
+        userLoggedIn = false
+    }
+}
+
+
 bodyToDosCreatorBtn.addEventListener("click", function () {
     createNewToDo()
 })
@@ -224,3 +318,10 @@ modalLoginBtn.addEventListener("click", function () {
     login()
     isThereAnyToDoDB()
 })
+
+document.addEventListener("DOMContentLoaded", function () {
+    autoUserLogInWithCookie();
+});
+
+
+
