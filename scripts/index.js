@@ -16,13 +16,14 @@ let loginBtnHeader = document.querySelector(".loginBtn")
 let headerMenuElement = document.querySelector(".headerMenu")
 let bodyToDosCreatedBox = document.querySelector(".bodyToDosCreatedBox")
 let bodyToDosErrorsMessages = document.querySelector(".bodyToDosErrorsMessages")
+
+let checkBoxes = document.querySelectorAll(".checkboxes")
 // Initialize Parse
 Parse.initialize(
     "3NPtJFuWZZEg3pi7e7SFETucsPSVgS5Si8fxZeRo",
     "RDtRQ0WT80183L5mabbnnEI2Z6LyVh0IT6gKMVOe"
 ); //PASTE HERE YOUR Back4App APPLICATION ID AND YOUR JavaScript KEY
 Parse.serverURL = "https://parseapi.back4app.com/";
-
 
 async function createNewToDo() {
     if (bodyToDosCreatorBoxNameInput.value && userLoggedIn) {
@@ -34,9 +35,10 @@ async function createNewToDo() {
 
         let newToDoRowInTable = `<tr>
         <td>#${number}</td>
-        <td>${toDoNameTable}</td>
+        <td class="toDoNamesClass">${toDoNameTable}</td>
         <td>${creationDateTable}</td>
         <td>${creationTimeTable}</td>
+        <td><input class="form-check-input checkboxes" type="checkbox" value="" id="${number}CheckBox"></td>
         </tr>`
         todosTableHeaderRow.insertAdjacentHTML("afterend", newToDoRowInTable);
 
@@ -47,10 +49,12 @@ async function createNewToDo() {
         createToDosClassDB.set("toDoName", toDoNameTable)
         createToDosClassDB.set("creationDate", creationDateTable)
         createToDosClassDB.set("creationTime", creationTimeTable)
+        createToDosClassDB.set("checkBox", false)
         createToDosClassDB.save().then((result) => {
             // console.log("New ToDo Created:", result);
             bodyToDosCreatorBoxNameInput.value = ""
             showMessageWhenAddToDo("New To-Do Created!", "complete")
+            addEventToCheckBoxes()
 
         }).catch((error) => {
             // console.log("Error creating new todo:", error);
@@ -175,15 +179,31 @@ async function loadUserToDosFromDB() {
                 let toDoNameGotFromDB = toDoRow.get("toDoName")
                 let creationDateGotFromDB = toDoRow.get("creationDate")
                 let creationTimeGotFromDB = toDoRow.get("creationTime")
-                let newToDoRowInTable = `<tr>
-                <td>#${numberGotFromDB}</td>
-                <td>${toDoNameGotFromDB}</td>
-                <td>${creationDateGotFromDB}</td>
-                <td>${creationTimeGotFromDB}</td>
-                </tr>`
-                todosTableHeaderRow.insertAdjacentHTML("afterend", newToDoRowInTable);
-                changeCreatedToDosBackground()
+                let checkBoxGotFromDB = toDoRow.get("checkBox")
+                if (checkBoxGotFromDB) {
+                    let newToDoRowInTable = `<tr>
+                    <td>#${numberGotFromDB}</td>
+                    <td class="toDoNamesClass">${toDoNameGotFromDB}</td>
+                    <td>${creationDateGotFromDB}</td>
+                    <td>${creationTimeGotFromDB}</td>
+                    <td><input class="form-check-input checkboxes" type="checkbox" value="" id="${number}CheckBox" checked></td>
+                    </tr>`
+                    todosTableHeaderRow.insertAdjacentHTML("afterend", newToDoRowInTable);
+                    changeCreatedToDosBackground()
+                } else {
+                    let newToDoRowInTable = `<tr>
+                    <td>#${numberGotFromDB}</td>
+                    <td class="toDoNamesClass">${toDoNameGotFromDB}</td>
+                    <td>${creationDateGotFromDB}</td>
+                    <td>${creationTimeGotFromDB}</td>
+                    <td><input class="form-check-input checkboxes" type="checkbox" value="" id="${number}CheckBox"></td>
+                    </tr>`
+                    todosTableHeaderRow.insertAdjacentHTML("afterend", newToDoRowInTable);
+                    changeCreatedToDosBackground()
+                }
             })
+            addEventToCheckBoxes()
+
         }
     } catch (error) {
         console.log("Error finding todo items:", error);
@@ -309,6 +329,37 @@ async function autoLoginWithCookie(email, password) {
     }
 }
 
+async function updateToDoCheckbox(event) {
+    // Get the todo name from the parent <tr> element
+    const todoName = event.target.closest('tr').querySelector('.toDoNamesClass').textContent.trim();
+
+    // Get the current value of the checkbox
+    const checkbox = event.target;
+    const checked = checkbox.checked;
+
+    // Update the "ToDos" class in the database
+    const ToDos = Parse.Object.extend('ToDos');
+    const query = new Parse.Query(ToDos);
+    query.equalTo('username', userUsername);
+    query.equalTo('toDoName', todoName);
+    const results = await query.find();
+
+    if (results.length > 0) {
+        const toDo = results[0];
+        toDo.set('checkBox', checked);
+        await toDo.save();
+    }
+}
+
+function addEventToCheckBoxes() {
+    const checkBoxes = document.querySelectorAll('.checkboxes');
+    // Add event listeners to all checkboxes
+    checkBoxes.forEach(checkBox => {
+        checkBox.addEventListener('change', updateToDoCheckbox);
+    });
+
+}
+
 
 bodyToDosCreatorBtn.addEventListener("click", function () {
     createNewToDo()
@@ -322,6 +373,5 @@ modalLoginBtn.addEventListener("click", function () {
 document.addEventListener("DOMContentLoaded", function () {
     autoUserLogInWithCookie();
 });
-
 
 
