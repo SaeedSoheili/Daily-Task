@@ -30,4 +30,4 @@ We welcome contributions to the Daily-Task project. If you have a feature reques
 
 
 
-- [MinusMarigold98](https://www.discordapp.com/users/382244660208205824) - Frontend Developer
+- [Saeed Soheili](https://www.discordapp.com/users/382244660208205824) - Frontend Developer
